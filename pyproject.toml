@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "iris-mosaics"
+version = "0.1.0"
+description = "Processing pipeline for IRIS full-disk mosaics, with pointing-dependent FUV background subtraction"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy",
+    "scipy",
+    "astropy",
+    "sunpy[net]",       # JSOC/Fido queries in download_level_1
+    "matplotlib",
+    "astroscrappy",     # cosmic ray / spike detection
+    "scikit-image",     # Otsu, misc image utilities
+    "numba",            # accelerated relaxation fill
+    "pyinterp",         # Gauss-Seidel relaxation fill of masked background
+    "reproject",        # mosaic assembly
+    "regridding",       # mosaic assembly
+    "ndfilters",        # trimmed-mean filters
+    "ipython",
+]
+
+[project.optional-dependencies]
+dev = [
+    "jupyterlab",
+    "nbstripout",
+]
+
+[tool.setuptools.packages.find]
+include = ["iris_mosaics*"]

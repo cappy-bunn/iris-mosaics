@@ -21,6 +21,7 @@ dependencies = [
     "regridding",       # mosaic assembly
     "ndfilters",        # trimmed-mean filters
     "ipython",
+    "pyyaml",           # config/*.yaml
 ]
 
 [project.optional-dependencies]

@@ -87,8 +87,9 @@ Astro-SCRAPPY cosmic-ray detection. Replace all NaNs with zeros until after
 despiking — the despiker mishandles spikes adjacent to NaNs, and leftover large
 spikes badly influence the polynomial fit in the background subtraction.
 
-Images with excessive spikes are identified and re-despiked with adjusted
-padding; the worst are set to NaN entirely.
+Images with excessive spikes are identified and the worst are set to NaN
+entirely. (A second despiking pass over the moderately spiky images was tried
+and dropped — not worth the cost.)
 
 ## 7. Level 1.2: two-step background subtraction (local)
 
@@ -135,8 +136,18 @@ Uses `/nosat, /nodark, /noback, /shift_wave, /shift_fid, /poly2d, /filter_wave,
 
 ## 11. Wavelength calibration
 
-`notebooks/wavelength_calibration.ipynb` — computes the shift from neutral
-lines. The shift is **per mosaic**; record it in [STATUS.md](STATUS.md).
+`notebooks/wavelength_calibration.ipynb` — fits the neutral lines (Fe II
+1392.149, S I 1392.588, Fe II 1392.817 vacuum) and prints a single constant
+offset at the bottom of the notebook.
+
+The shift is **per mosaic**. Record new values in
+`config/wavelength_shifts.yaml`, where they can be read back during science
+analysis without reopening the notebook:
+
+```python
+from iris_mosaics import wavelength_shift
+sg_wavelength_aligned = sg_wavelength_full + wavelength_shift('20240811')
+```
 
 ## 12. Level 1.6: radiometric calibration (~30 min)
 

@@ -103,8 +103,16 @@ notebooks, to be moved into `config/<date>.yaml` in Phase 2 of the migration:
 
 | mosaic | wavelength shift | notes |
 |---|---|---|
-| 2014-03-24 | (in `wavelength_calibration.ipynb`) | 5 s step cadence |
-| 2019-09-12 | −0.018 Å | |
-| 2024-08-11 | (in `wavelength_calibration.ipynb`) | 2× spectral binning; needs rebinning before L1.6 |
+| 2014-03-24 | +0.015 Å | 5 s step cadence |
+| 2019-09-12 | +0.011 Å | |
+| 2024-08-11 | −0.018 Å | 2× spectral binning; needs rebinning before L1.6 |
+
+The shifts are stored machine-readably in `config/wavelength_shifts.yaml` and
+are available during science analysis without opening a notebook:
+
+```python
+from iris_mosaics import wavelength_shift
+sg_wavelength_aligned = sg_wavelength_full + wavelength_shift('20240811')
+```
 
 Raster length is 64 images for all mosaics processed so far.

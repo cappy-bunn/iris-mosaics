@@ -125,15 +125,38 @@ iris-mosaics/
     notebooks executed per-run via papermill give an inspectable record of
     every mosaic without manual clicking.
 
-### Filament access: questions to answer before phase 3
+### Filament access: probe results (tested 2026-08-26)
 
-- [ ] Is public-key SSH auth permitted on filament?
-- [ ] Does non-interactive command execution work (`ssh filament hostname`)?
-- [ ] How is IDL/SSW launched non-interactively (`sswidl` batch flags, or
-      `idl` + SSW startup script)?
-- [ ] Is `rsync` present on filament?
-- [ ] Is `screen`/`tmux` available for long jobs, or is `nohup` the fallback?
-- [ ] Any VPN/jump-host requirement from off campus?
+- [x] Public-key SSH auth works (ed25519 key installed; `Host filament` alias
+      in `~/.ssh/config`).
+- [x] Non-interactive command execution works.
+- [x] Plain IDL 8.5.1 runs headless over SSH; license checks out with no tty.
+- [x] SSW IDL batch mode works: `echo "print, 2+2" | sswidl` loads the full
+      SSW environment (500 paths, `IRIS_DATA=/archive/iris/data`, personal
+      `IDL_STARTUP`) and executes. `sswidl` is a tcsh alias for
+      `/ssw/gen/setup/ssw_idl`, available even in non-interactive shells.
+- [x] `rsync`, `screen`, and `tmux` all present.
+- [x] Detached jobs survive disconnect: `screen -dm sh -c "..."` keeps running
+      after the SSH session closes; poll a sentinel file for completion.
+- [ ] VPN/jump-host requirement from off campus: still to confirm (one
+      connectivity drop observed mid-testing; cause not yet identified).
+
+Constraints learned while probing:
+
+- **Remote login shell is tcsh**, and it rejects bash-isms (`2>&1` →
+  "Ambiguous output redirect"; `>>` to a nonexistent file fails under
+  noclobber). Interactive-prompting aliases are also present (`rm` → `rm -i`),
+  which hang or fail with no tty. Automation must wrap remote commands in
+  `sh -c '...'` or upload script files rather than passing compound shell
+  strings, and use explicit flags (`rm -f`) rather than relying on defaults.
+- **`/disk/data` (NFS mount `helicity:/hl0`) is 100% full** — ~181 GB free of
+  39 TB at probe time. A mosaic's level-1 data plus intermediates may not fit.
+  Check free space before every run; the orchestrator should refuse to start a
+  transfer that doesn't fit.
+- The `.pro` collection in `/disk/data/cbunn/calibrated_iris_mosaics/` is
+  larger than the runbook implies (`apply_dark_sub_iris_prep.pro`,
+  `apply_only_background_subtraction.pro`, `apply_iris_prep_fuv_only.pro`,
+  several `test_*.pro`). Triage live vs. historical during the Phase 1 copy.
 
 ## Order of value
 

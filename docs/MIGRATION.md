@@ -33,17 +33,24 @@ predates some notebook changes, and this table supersedes it where they differ):
 
 Supporting code to migrate:
 
-- `read_full_disk_mosaic.py` (mosaic assembly, WCS handling, plotting helpers)
-- `inpaint.py`, `inpaint_array.py`
+- `read_full_disk_mosaic.py` (mosaic assembly, WCS handling, plotting
+  helpers). Depends only on standard scientific packages plus `reproject` and
+  `regridding` — no FURST or kgpy dependency.
 - `iris_sra_c_*.geny` radiometric calibration files
-- IDL `.pro` scripts currently living only on filament at
-  `/disk/data/cbunn/calibrated_iris_mosaics/` — copy into `idl/` so they are
-  finally under version control (`download_mosaic_lvl1.pro`,
-  `apply_iris_prep_through_bg_subtraction.pro`, `apply_remaining_iris_prep.pro`,
-  and anything else that folder holds)
+- The two IDL `.pro` scripts actually in use on filament — copy into `idl/`
+  so they are finally under version control:
+  `apply_iris_prep_through_bg_subtraction.pro` and
+  `apply_remaining_iris_prep.pro`. The rest of
+  `/disk/data/cbunn/calibrated_iris_mosaics/` (including
+  `download_mosaic_lvl1.pro`, retired because it missed files — level 1 is
+  now downloaded locally via sunpy/JSOC) is historical and stays put.
 
-To confirm whether still used before migrating: `apply_saa_mask.ipynb`,
-`find_and_remove_iris_prep_background.ipynb`.
+Confirmed NOT used (do not migrate): `apply_saa_mask.ipynb`,
+`find_and_remove_iris_prep_background.ipynb`, `inpaint.py`,
+`inpaint_array.py` (inpainting superseded by the Gauss-Seidel relaxation fill
+in `background_subtraction.ipynb`; remaining `inpaint`/`kgpy` imports in the
+canonical notebooks are vestigial — imported, never called — and go away with
+dead-code pruning).
 
 Explicitly left behind: figures, `.ai` files, `raster.tar.gz`, superseded and
 exploratory notebooks (`remove_fixed_pattern.ipynb`, `build_mosaic_test.ipynb`,
@@ -66,13 +73,19 @@ iris-mosaics/
 
 ### Phase 0 — hygiene (before anything is copied)
 
-1. **Credentials.** Remove the filament credentials embedded in
-   `upload_to_filament.ipynb`: rotate the filament password, set up SSH
-   public-key authentication, and put host settings in `~/.ssh/config`.
-   No credentials of any kind in this repository, ever.
-2. **Notebook output stripping.** Install `nbstripout` as a git filter in this
-   repo so notebook outputs never reach git (the current copies run to 24 MB).
-   Working copies keep their outputs locally; commits are clean sources.
+1. **Credentials.** DONE. SSH public-key authentication is set up and a
+   `Host filament` alias lives in `~/.ssh/config`, so transfers no longer need
+   a password at all. The old `upload_to_filament.ipynb` embedded the filament
+   password in a `pysftp.Connection(...)` call; that notebook is rewritten
+   against the key, and **no credentials of any kind enter this repository,
+   ever**. (The password itself is deliberately not being rotated: it was only
+   ever exposed on a private group server that is no longer reachable, and
+   everyone who could have seen it already has filament access.)
+2. **Notebook output stripping.** DONE. `nbstripout` is installed as a git
+   filter with `.gitattributes` committed, so notebook outputs never reach git
+   (the FURST copies run to 24 MB). Working copies keep their outputs locally;
+   commits are clean sources. A fresh clone needs `pip install nbstripout &&
+   nbstripout --install` once to activate the filter locally.
 
 ### Phase 1 — faithful transfer (no behavior change)
 
@@ -108,22 +121,49 @@ iris-mosaics/
 ### Phase 3 — automate (including filament)
 
 11. **Remote execution instead of remote elimination.** `iris_prep` is deep
-    SSW IDL and stays on filament. Automate around it:
+    SSW IDL and stays on filament. Only two `.pro` scripts are involved
+    (`apply_iris_prep_through_bg_subtraction.pro`,
+    `apply_remaining_iris_prep.pro`). Automate around them:
     - SSH key auth (from phase 0) enables non-interactive remote commands.
-    - Run IDL in batch mode over SSH (exact invocation TBD after access
-      testing; see below).
-    - Long jobs (7–9 h) must survive dropped connections: launch under
-      `nohup`/`screen`/`tmux` and poll a sentinel file for completion.
-12. **Transfers.** Replace pysftp file loops with `rsync` if available on both
-    ends (restartable, verifiable), else batched `sftp`/`scp` with retry.
-    Transfers are the slowest pipeline stage (5–10 h); restartability matters
-    more than raw speed.
-13. **Orchestration.** A small CLI, e.g.
+    - Pipe a generated IDL batch script into `sswidl` (verified working
+      headless). Parameterize paths via the generated script instead of
+      hand-editing the `.pro` files on filament.
+    - Long jobs (7–9 h) outlive the connection: launch with `screen -dm` and
+      poll a sentinel file for completion. This is mandatory, not optional —
+      the campus VPN can drop mid-run.
+12. **Transfers.** Replace the pysftp file loops with `rsync` (present on both
+    ends): restartable, verifiable, and resumable after a VPN drop. Transfers
+    are the slowest pipeline stage (5–10 h), so restartability matters more
+    than raw speed.
+13. **Storage lifecycle.** See below; the orchestrator owns this rather than
+    leaving it to memory.
+14. **Orchestration.** A small CLI, e.g.
     `python -m iris_mosaics run 20240811 --from despike --to build`, where each
     step declares file inputs/outputs and completed steps are skipped.
     Snakemake is a good fit if a real DAG runner proves warranted. Diagnostic
     notebooks executed per-run via papermill give an inspectable record of
     every mosaic without manual clicking.
+
+### Storage lifecycle
+
+Two tiers, with different rules:
+
+- **`D:` (local) — the archive.** Every level of every mosaic is kept
+  (`D:\IRIS data\deep_mosaics\<date>\level_*`). Nothing is deleted here.
+- **filament — scratch space only.** `/disk/data` is at ~100% capacity, so a
+  mosaic's previous level is deleted as soon as the next level is being
+  produced. Only the level currently being worked on should exist there.
+
+Requirements this places on the orchestrator:
+
+- Check free space on filament *before* starting a transfer and refuse to
+  start one that will not fit, rather than filling a shared group disk.
+- After a remote step completes and its output has been downloaded **and
+  verified** against the local archive, delete the now-superseded remote level.
+  Deletion must be gated on verified local copies, never on the transfer
+  merely having been attempted — the local archive is the only copy that
+  matters.
+- Never delete anything on `D:`.
 
 ### Filament access: probe results (tested 2026-08-26)
 
@@ -138,8 +178,13 @@ iris-mosaics/
 - [x] `rsync`, `screen`, and `tmux` all present.
 - [x] Detached jobs survive disconnect: `screen -dm sh -c "..."` keeps running
       after the SSH session closes; poll a sentinel file for completion.
-- [ ] VPN/jump-host requirement from off campus: still to confirm (one
-      connectivity drop observed mid-testing; cause not yet identified).
+- [x] **Campus VPN is required.** The connectivity drop observed mid-testing
+      was the VPN disconnecting; filament became reachable again immediately on
+      reconnecting. (This appears to be newer or stricter than expected —
+      historically the VPN did not seem necessary.) Any unattended
+      orchestration must therefore assume the VPN can drop mid-run: remote jobs
+      must survive disconnection (they do, see `screen` above) and transfers
+      must be restartable (`rsync`).
 
 Constraints learned while probing:
 
@@ -149,10 +194,13 @@ Constraints learned while probing:
   which hang or fail with no tty. Automation must wrap remote commands in
   `sh -c '...'` or upload script files rather than passing compound shell
   strings, and use explicit flags (`rm -f`) rather than relying on defaults.
-- **`/disk/data` (NFS mount `helicity:/hl0`) is 100% full** — ~181 GB free of
-  39 TB at probe time. A mosaic's level-1 data plus intermediates may not fit.
-  Check free space before every run; the orchestrator should refuse to start a
-  transfer that doesn't fit.
+- **`/disk/data` (NFS mount `helicity:/hl0`) is effectively full** — ~181 GB
+  free of 39 TB at probe time. Filament is working space, not storage: the
+  current practice is to **delete the previous level of a mosaic on filament
+  as soon as the next level is being produced**. The local `D:` drive is the
+  archive and keeps every level. Automation must reproduce this discipline
+  explicitly rather than inheriting it as a habit (see Storage lifecycle
+  below).
 - The `.pro` collection in `/disk/data/cbunn/calibrated_iris_mosaics/` is
   larger than the runbook implies (`apply_dark_sub_iris_prep.pro`,
   `apply_only_background_subtraction.pro`, `apply_iris_prep_fuv_only.pro`,

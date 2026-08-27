@@ -1,33 +1,29 @@
 """Per-mosaic calibration values.
 
 Values determined once by the pipeline notebooks and needed again later during
-science analysis. Kept here rather than inside a notebook cell so they can be
-looked up directly:
+science analysis. They live in the per-mosaic configs under ``config/`` so
+there is a single source of truth, but are reachable directly:
 
     >>> from iris_mosaics import wavelength_shift
     >>> wavelength_shift('20240811')
     <Quantity -0.018 Angstrom>
 """
 
-import pathlib as pl
+from __future__ import annotations
 
 import astropy.units as u
-import yaml
 
-CONFIG_DIR = pl.Path(__file__).parent.parent / "config"
-_WAVELENGTH_SHIFTS = CONFIG_DIR / "wavelength_shifts.yaml"
-
-
-def _load(path: pl.Path) -> dict:
-    with open(path, encoding="utf-8") as f:
-        return yaml.safe_load(f)
+from .config import MosaicConfig
 
 
 def wavelength_shifts() -> dict[str, u.Quantity]:
-    """All known wavelength shifts, keyed by mosaic date string (YYYYMMDD)."""
-    doc = _load(_WAVELENGTH_SHIFTS)
-    unit = u.Unit(doc["units"])
-    return {date: value * unit for date, value in doc["shifts"].items()}
+    """Wavelength shifts for every mosaic that has been calibrated."""
+    shifts = {}
+    for date in MosaicConfig.available():
+        shift = MosaicConfig.load(date).wavelength_shift
+        if shift is not None:
+            shifts[date] = shift
+    return shifts
 
 
 def wavelength_shift(date_string: str) -> u.Quantity:
@@ -37,15 +33,16 @@ def wavelength_shift(date_string: str) -> u.Quantity:
     neutral lines with their nominal positions.
 
     Raises KeyError if the mosaic has not been wavelength calibrated yet; run
-    ``notebooks/wavelength_calibration.ipynb`` and add the result to
-    ``config/wavelength_shifts.yaml``.
+    ``notebooks/wavelength_calibration.ipynb`` and set
+    ``wavelength_shift_angstrom`` in ``config/<date>.yaml``.
     """
-    shifts = wavelength_shifts()
-    if date_string not in shifts:
-        known = ", ".join(sorted(shifts)) or "none"
+    shift = MosaicConfig.load(date_string).wavelength_shift
+    if shift is None:
+        known = ", ".join(sorted(wavelength_shifts())) or "none"
         raise KeyError(
-            f"no wavelength shift recorded for {date_string!r}; known: {known}. "
-            "Run notebooks/wavelength_calibration.ipynb and add it to "
-            "config/wavelength_shifts.yaml"
+            f"mosaic {date_string!r} has no wavelength shift recorded yet; "
+            f"calibrated mosaics: {known}. Run "
+            "notebooks/wavelength_calibration.ipynb and set "
+            f"wavelength_shift_angstrom in config/{date_string}.yaml"
         )
-    return shifts[date_string]
+    return shift

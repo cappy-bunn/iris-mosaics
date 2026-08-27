@@ -1,0 +1,26 @@
+# Configuration for the 20151018 IRIS full-disk mosaic.
+# Values that used to be edited by hand into notebook cells.
+
+date: "20151018"
+
+# JSOC export window (mosaic start/end plus a 2-minute margin).
+jsoc:
+  start: "2015-10-18 10:26:27"
+  end: "2015-10-20 01:05:02"
+
+# Local archive root. Every processing level lives under here.
+data_root: "D:/IRIS data/deep_mosaics/20151018"
+
+raster:
+  num_img_per_raster: 64
+  step_arcsec: 2
+
+# 2 means the spectral axis has twice the usual pixels and needs rebinning
+# before radiometric calibration.
+spectral_binning: 1
+
+# Additive offset aligning the neutral lines, from wavelength_calibration.ipynb.
+# null until that notebook has been run for this mosaic.
+wavelength_shift_angstrom: null
+
+notes: "A couple of rasters are missing."

@@ -1,0 +1,26 @@
+# Configuration for the 20190912 IRIS full-disk mosaic.
+# Values that used to be edited by hand into notebook cells.
+
+date: "20190912"
+
+# JSOC export window (mosaic start/end plus a 2-minute margin).
+jsoc:
+  start: "2019-09-12 12:25:00"
+  end: "2019-09-14 03:10:00"
+
+# Local archive root. Every processing level lives under here.
+data_root: "D:/IRIS data/deep_mosaics/20190912"
+
+raster:
+  num_img_per_raster: 64
+  step_arcsec: 2
+
+# 2 means the spectral axis has twice the usual pixels and needs rebinning
+# before radiometric calibration.
+spectral_binning: 1
+
+# Additive offset aligning the neutral lines, from wavelength_calibration.ipynb.
+# null until that notebook has been run for this mosaic.
+wavelength_shift_angstrom: 0.011
+
+notes: "Despike date in the old ledger precedes fixed-pattern removal; may need rerunning."

@@ -104,16 +104,25 @@ iris-mosaics/
 
 ### Phase 2 — parameterize (remove manual cell editing)
 
-8. One `config/<date>.yaml` per mosaic: JSOC time range, data root, raster
-   length (64), spectral binning, wavelength shift, known missing rasters,
-   per-date quirks. Notebooks read the config instead of hardcoding
-   `date_string` and `D:\IRIS data\...` paths.
-9. Move duplicated/substantial logic into the package: raster
-   reshape-and-gap-fill (currently duplicated between
-   `apply_rolling_trimmed_mean` and `wavelength_calibration`),
-   `plot_lines_sidebyside`, despike wrapper, fixed-pattern removal, the
-   two-step background subtraction. Notebooks become thin: load config → call
-   package function → plot diagnostics.
+8. DONE. One `config/<date>.yaml` per mosaic holds the JSOC time range, data
+   root, raster geometry, spectral binning, wavelength shift and per-date
+   notes; `iris_mosaics.MosaicConfig` loads it and resolves the standard level
+   directories and pickle names. Notebooks now open with a single
+   `cfg = MosaicConfig.load('<date>')` instead of a hardcoded
+   `D:\IRIS data\...` path. Configs exist for 20140324, 20151018, 20190912,
+   20220507 and 20240811; add one per new mosaic.
+9. IN PROGRESS. Moved into the package so far:
+   - `iris_mosaics.rasters` — raster reshape-and-gap-fill, which was duplicated
+     cell for cell between `apply_rolling_trimmed_mean` and
+     `wavelength_calibration`. `plan_rasters` computes the layout without
+     touching data; `pad`/`unpad` are exact inverses (tracked by index) and are
+     unit tested in `tests/test_rasters.py`. `apply_rolling_trimmed_mean` now
+     uses it; `wavelength_calibration` still carries its own copy.
+   - `iris_mosaics.plotting.plot_lines_sidebyside` — was defined identically in
+     three notebooks.
+
+   Still to hoist: the despike wrapper, fixed-pattern removal, and the two-step
+   background subtraction.
 10. Replace the hand-kept status ledger with a machine-readable manifest per
     mosaic (`status.json`: step, completion date, file counts/hashes) that each
     step updates automatically.

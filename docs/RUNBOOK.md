@@ -109,12 +109,20 @@ cleanly into 64-image rasters.
 
 Then `notebooks/background_subtraction.ipynb`:
 
-- **Step 1** — mask the spectral lines (and fiducials), smooth the trimmed-mean
-  images, fill the masked regions by Gauss-Seidel relaxation (`pyinterp`), and
-  correct the **notched region at Si IV 1394** by multiplying by the smoothed
-  Wülser FUV background image. Subtract the result.
+- **Step 1** — mask the spectral lines (and the fiducials), smooth the
+  trimmed-mean images, and fill the masked regions by Gauss-Seidel relaxation
+  (`pyinterp`). The filled result is the step-1 background; subtract it.
 - **Step 2** — fit the remaining background per image with a low-order (degree
   3) 2D polynomial and subtract that too.
+
+> The normalized FUV background image supplied by the IRIS team was previously
+> used here — to divide the trimmed-mean images, and to correct the notched
+> region at Si IV 1394 by multiplying by the smoothed background. **That is no
+> longer done**; the step-1 background is built entirely from the data. Those
+> cells have been removed from the notebook.
+>
+> This is separate from the Wülser Zernike FUV background subtraction, which is
+> still applied upstream by `iris_prep` on filament (step 3).
 
 Together these remove essentially all the background, including some genuine
 continuum. That is acceptable: the science target is the far wings of the Si IV

@@ -83,9 +83,18 @@ variant was tried and abandoned.)
 
 `notebooks/despike_and_save.ipynb`
 
-Astro-SCRAPPY cosmic-ray detection. Replace all NaNs with zeros until after
-despiking — the despiker mishandles spikes adjacent to NaNs, and leftover large
-spikes badly influence the polynomial fit in the background subtraction.
+Astro-SCRAPPY cosmic-ray detection. The despiker mishandles spikes adjacent to
+NaNs, and leftover large spikes badly influence the polynomial fit in the
+background subtraction, so NaNs are dealt with before despiking:
+
+- If a **significant fraction** of a spectrograph image is NaN, the whole image
+  is called NaN (`all_nan_mask_*`).
+- Otherwise the NaN pixels are set to a **large value (16384)**, which the
+  despiker then treats as a spike and squashes.
+
+Because the despiker repairs those pixels, the NaNs are deliberately **not**
+restored afterwards — the `sg_*_dspk[nan_mask_*] = np.nan` line stays commented
+out. Uncommenting it would throw away the despiker's repair.
 
 Images with excessive spikes are identified and the worst are set to NaN
 entirely. (A second despiking pass over the moderately spiky images was tried

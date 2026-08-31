@@ -34,6 +34,10 @@ process the export request and emails when ready; the download itself is ~2.5 h.
 
 `notebooks/upload_to_filament.ipynb` with `level = 'level_1'`.
 
+Transfers go through rsync (via WSL on Windows), so a run interrupted by a VPN
+drop resumes rather than starting over. The notebook checks free space on
+filament first and verifies the file count afterwards.
+
 ## 3. Level 1.1: iris_prep part 1 + Wülser background (filament, ~7 h)
 
 `idl/apply_iris_prep_through_bg_subtraction.pro`
@@ -157,9 +161,9 @@ Uses `/nosat, /nodark, /noback, /shift_wave, /shift_fid, /poly2d, /filter_wave,
 1392.149, S I 1392.588, Fe II 1392.817 vacuum) and prints a single constant
 offset at the bottom of the notebook.
 
-The shift is **per mosaic**. Record new values in
-`config/wavelength_shifts.yaml`, where they can be read back during science
-analysis without reopening the notebook:
+The shift is **per mosaic**. Record it as `wavelength_shift_angstrom` in
+`config/<date>.yaml`, where it can be read back during science analysis without
+reopening the notebook:
 
 ```python
 from iris_mosaics import wavelength_shift

@@ -98,8 +98,7 @@ fixed pattern removed → **DSP** despiked → **L1.2** MSU background subtracte
 
 ## Per-mosaic parameters
 
-Values that currently live as edited cells or commented-out blocks in the
-notebooks, to be moved into `config/<date>.yaml` in Phase 2 of the migration:
+These now live in `config/<date>.yaml`; the table is a summary.
 
 | mosaic | wavelength shift | notes |
 |---|---|---|
@@ -107,8 +106,8 @@ notebooks, to be moved into `config/<date>.yaml` in Phase 2 of the migration:
 | 2019-09-12 | +0.011 Å | |
 | 2024-08-11 | −0.018 Å | 2× spectral binning; needs rebinning before L1.6 |
 
-The shifts are stored machine-readably in `config/wavelength_shifts.yaml` and
-are available during science analysis without opening a notebook:
+Each mosaic's shift is stored as `wavelength_shift_angstrom` in its config, and
+is available during science analysis without opening a notebook:
 
 ```python
 from iris_mosaics import wavelength_shift

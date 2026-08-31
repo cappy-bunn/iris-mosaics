@@ -140,10 +140,19 @@ iris-mosaics/
     - Long jobs (7–9 h) outlive the connection: launch with `screen -dm` and
       poll a sentinel file for completion. This is mandatory, not optional —
       the campus VPN can drop mid-run.
-12. **Transfers.** Replace the pysftp file loops with `rsync` (present on both
-    ends): restartable, verifiable, and resumable after a VPN drop. Transfers
-    are the slowest pipeline stage (5–10 h), so restartability matters more
-    than raw speed.
+12. **Transfers.** DONE. `iris_mosaics.transfer` wraps rsync with `--partial`
+    for resume-after-drop, plus free-space and file-count checks;
+    `upload_to_filament.ipynb` uses it. Windows OpenSSH has no rsync, so it is
+    reached through **WSL** (Ubuntu, WSL1 — `/mnt/d` is near-native: a stat walk
+    of 11,767 files took 0.63 s). WSL has its own `~/.ssh`; the key is copied
+    there, and the host is given fully qualified since WSL does not inherit the
+    Windows ssh config.
+
+    Note `size_only=True`: rsync's default size+mtime comparison re-sends
+    everything uploaded by the old scp/pysftp route, because those mtimes do not
+    match the local files. Comparing size alone correctly recognises them as
+    already present. Verified against 20240811 level_12 (11,767 files,
+    53.7 GB): default would re-send all of them, `--size-only` sends none.
 13. **Storage lifecycle.** See below; the orchestrator owns this rather than
     leaving it to memory.
 14. **Orchestration.** A small CLI, e.g.

@@ -23,4 +23,13 @@ spectral_binning: 2
 # null until that notebook has been run for this mosaic.
 wavelength_shift_angstrom: -0.018
 
+# Occulting geometry for fixed-pattern removal (off-disk pixel selection).
+# limb_radius_arcsec null means: read RSUN_OBS from the FITS header and add
+# 10 arcsec. The centre offsets recentre the mask on the actual solar disk.
+off_disk:
+  limb_radius_arcsec: null
+  margin_arcsec: 60
+  center_offset_x_arcsec: -4
+  center_offset_y_arcsec: 10
+
 notes: "2x spectral pixels; rebin to the normal spectral sampling before radiometric calibration."

@@ -1,0 +1,27 @@
+{
+  "date": "20140324",
+  "steps": {
+    "level_1": {
+      "date": "2026-05-12"
+    },
+    "level_11": {
+      "date": "2026-05-14"
+    },
+    "fixed_pattern_removed": {
+      "date": "2026-05-15"
+    },
+    "despiked": {
+      "date": "2026-05-18"
+    },
+    "level_12": {
+      "date": "2026-05-25"
+    },
+    "level_15": {
+      "date": "2026-05-26"
+    },
+    "level_16": {
+      "date": "2026-07-30"
+    }
+  },
+  "notes": "5-second step cadence instead of 9-second."
+}

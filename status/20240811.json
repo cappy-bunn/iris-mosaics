@@ -1,0 +1,30 @@
+{
+  "date": "20240811",
+  "steps": {
+    "level_1": {
+      "date": "2026-05-28"
+    },
+    "level_11": {
+      "date": "2026-06-30"
+    },
+    "fixed_pattern_removed": {
+      "date": "2026-07-08"
+    },
+    "despiked": {
+      "date": "2026-07-21"
+    },
+    "level_12": {
+      "date": "2026-07-26"
+    },
+    "level_15": {
+      "date": "2026-07-28"
+    },
+    "level_15_rebinned": {
+      "date": "2026-07-31"
+    },
+    "level_16": {
+      "date": "2026-07-31"
+    }
+  },
+  "notes": "2x spectral pixels; rebinned before radiometric calibration."
+}

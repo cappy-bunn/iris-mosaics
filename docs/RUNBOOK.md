@@ -1,7 +1,17 @@
 # Runbook: processing an IRIS full-disk mosaic
 
-Supersedes `Notes_on_IRIS_FDM_datasets.pdf`. Per-mosaic progress is tracked in
-[STATUS.md](STATUS.md).
+Supersedes `Notes_on_IRIS_FDM_datasets.pdf`.
+
+Per-mosaic progress lives in `status/<date>.json`; record a completed step with
+`Manifest.record(...)` rather than editing [STATUS.md](STATUS.md), which is
+generated from those files:
+
+```python
+from iris_mosaics import Manifest
+m = Manifest.load('20240811')
+m.record('despiked', n_files=11767)
+m.save()
+```
 
 Levels produced, in order: **L1** (raw from JSOC) → **L1.1** (`iris_prep` part 1
 + Wülser Zernike FUV background) → fixed-pattern removed → despiked → **L1.2**

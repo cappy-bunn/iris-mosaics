@@ -1,0 +1,27 @@
+{
+  "date": "20190912",
+  "steps": {
+    "level_1": {
+      "date": "2023-02-07"
+    },
+    "level_11": {
+      "date": "2026-01-10"
+    },
+    "fixed_pattern_removed": {
+      "date": "2026-04-06"
+    },
+    "despiked": {
+      "date": "2026-01-14"
+    },
+    "level_12": {
+      "date": "2026-04-07"
+    },
+    "level_15": {
+      "date": "2026-04-15"
+    },
+    "level_16": {
+      "date": "2026-07-30"
+    }
+  },
+  "notes": "Despike predates fixed-pattern removal in the original ledger."
+}

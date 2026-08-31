@@ -13,6 +13,8 @@ from .config import MosaicConfig
 from .calibration import wavelength_shift, wavelength_shifts
 from .plotting import plot_lines_sidebyside
 from .rasters import RasterLayout, plan_rasters, read_pointing
+from .manifest import Manifest
+from . import background, despike, fixed_pattern, transfer
 
 #: Names served lazily from .read_full_disk_mosaic
 _MOSAIC_EXPORTS = frozenset({
@@ -44,6 +46,11 @@ __all__ = sorted(
         "plot_lines_sidebyside",
         "wavelength_shift",
         "wavelength_shifts",
+        "Manifest",
+        "background",
+        "despike",
+        "fixed_pattern",
+        "transfer",
     }
 )
 

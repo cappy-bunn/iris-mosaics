@@ -53,6 +53,9 @@ class MosaicConfig:
     raster_step: u.Quantity = 2 * u.arcsec
     spectral_binning: int = 1
     wavelength_shift: u.Quantity | None = None
+    limb_radius: u.Quantity | None = None
+    off_disk_margin: u.Quantity = 60 * u.arcsec
+    disk_center_offset: tuple = (0 * u.arcsec, 0 * u.arcsec)
     notes: str = ""
 
     @classmethod
@@ -69,7 +72,9 @@ class MosaicConfig:
 
         jsoc = doc.get("jsoc") or {}
         raster = doc.get("raster") or {}
+        off_disk = doc.get("off_disk") or {}
         shift = doc.get("wavelength_shift_angstrom")
+        limb = off_disk.get("limb_radius_arcsec")
 
         return cls(
             date=str(doc["date"]),
@@ -80,6 +85,12 @@ class MosaicConfig:
             raster_step=raster.get("step_arcsec", 2) * u.arcsec,
             spectral_binning=doc.get("spectral_binning", 1),
             wavelength_shift=None if shift is None else shift * u.AA,
+            limb_radius=None if limb is None else limb * u.arcsec,
+            off_disk_margin=off_disk.get("margin_arcsec", 60) * u.arcsec,
+            disk_center_offset=(
+                off_disk.get("center_offset_x_arcsec", 0) * u.arcsec,
+                off_disk.get("center_offset_y_arcsec", 0) * u.arcsec,
+            ),
             notes=doc.get("notes", ""),
         )
 

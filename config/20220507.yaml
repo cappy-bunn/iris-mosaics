@@ -23,4 +23,13 @@ spectral_binning: 1
 # null until that notebook has been run for this mosaic.
 wavelength_shift_angstrom: null
 
+# Occulting geometry for fixed-pattern removal (off-disk pixel selection).
+# Not yet determined for this mosaic -- run remove_fixed_pattern_full_ccd.ipynb,
+# check the disk is centred in the mask, and record the values here.
+off_disk:
+  limb_radius_arcsec: null
+  margin_arcsec: 60
+  center_offset_x_arcsec: 0
+  center_offset_y_arcsec: 0
+
 notes: ""

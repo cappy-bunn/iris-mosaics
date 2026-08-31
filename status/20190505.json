@@ -1,0 +1,18 @@
+{
+  "date": "20190505",
+  "steps": {
+    "level_1": {
+      "date": "2024-02-21"
+    },
+    "level_11": {
+      "date": "2025-01-03"
+    },
+    "fixed_pattern_removed": {
+      "date": "2025-01-15"
+    },
+    "despiked": {
+      "date": "2025-01-16"
+    }
+  },
+  "notes": ""
+}

@@ -1,117 +1,163 @@
 # Status of deep FDMs
 
-Per-mosaic processing progress. Transcribed from
-`Notes_on_IRIS_FDM_datasets.pdf` (August 2026); that PDF is superseded by this
-file and [RUNBOOK.md](RUNBOOK.md).
+**Generated from `status/*.json` by `iris_mosaics.manifest`. Do not edit by
+hand** — record progress with `Manifest.record(...)` instead.
 
-Levels: **L1** raw → **L1.1** iris_prep part 1 + Wülser background → **FPR**
-fixed pattern removed → **DSP** despiked → **L1.2** MSU background subtracted →
-**L1.5** iris_prep part 2 → **L1.6** radiometric conversion calculated →
-**MOSAIC** assembled.
+See [RUNBOOK.md](RUNBOOK.md) for the procedure. Per-mosaic parameters live in
+`config/<date>.yaml`; the ones shown here are a summary of that file.
 
-`*` = 5-second step cadence instead of 9-second.
+## 2013-10-27
 
-## Fully processed to L1.6
+5-second step cadence. Not started.
 
-### 2014-03-24 `*`
-- L1 downloaded via JSOC python notebook — 2026-05-12
-- L1.1 + JPW background subtraction — 2026-05-14
-- FPR — 2026-05-15
-- DSP — 2026-05-18
+- _not started_
+
+## 2014-03-17
+
+5-second step cadence. Not started.
+
+- _not started_
+
+## 2014-03-24
+
+5-second step cadence instead of 9-second.
+
+*wavelength shift +0.015 Å*
+
+- L1 downloaded from JSOC — 2026-05-12
+- L1.1 iris_prep part 1 + Wülser background — 2026-05-14
+- Fixed pattern removed — 2026-05-15
+- Despiked — 2026-05-18
 - L1.2 MSU background subtracted — 2026-05-25
-- L1.5 — 2026-05-26
+- L1.5 remainder of iris_prep — 2026-05-26
 - L1.6 radiometric conversion calculated — 2026-07-30
-- JSOC time range: `2014-03-24 03:18:00` → `2014-03-25 03:25:00`
 
-### 2019-09-12
-- L1 downloaded — 2023-02-07
-- L1.1 + JPW background subtracted — 2026-01-10
-- FPR — 2026-04-06
-- DSP — 2026-01-14 **(date precedes FPR — needs checking, possible rerun)**
+## 2015-04-01
+
+Large chunk of data missing.
+
+- L1 downloaded from JSOC — 2025-03-26
+
+## 2015-10-18
+
+A couple of rasters are missing.
+
+- L1 downloaded from JSOC — 2025-03-27
+- L1.1 iris_prep part 1 + Wülser background — 2026-07-07
+
+## 2017-10-21
+
+- L1 downloaded from JSOC — 2024-02-18
+- L1.1 iris_prep part 1 + Wülser background — 2024-02-20
+
+## 2018-08-25
+
+- L1 downloaded from JSOC — 2024-02-20
+- L1.1 iris_prep part 1 + Wülser background — 2024-02-21
+
+## 2019-04-13
+
+Large chunk of data missing. Not started.
+
+- _not started_
+
+## 2019-05-05
+
+- L1 downloaded from JSOC — 2024-02-21
+- L1.1 iris_prep part 1 + Wülser background — 2025-01-03
+- Fixed pattern removed — 2025-01-15
+- Despiked — 2025-01-16
+
+## 2019-09-12
+
+Despike predates fixed-pattern removal in the original ledger.
+
+*wavelength shift +0.011 Å*
+
+- L1 downloaded from JSOC — 2023-02-07
+- L1.1 iris_prep part 1 + Wülser background — 2026-01-10
+- Fixed pattern removed — 2026-04-06
+- Despiked — 2026-01-14
 - L1.2 MSU background subtracted — 2026-04-07
-- L1.5 — 2026-04-15
+- L1.5 remainder of iris_prep — 2026-04-15
 - L1.6 radiometric conversion calculated — 2026-07-30
-- JSOC time range: `2019-09-12 12:25:00` → `2019-09-14 03:10:00`
+- ⚠️ **despiked** is dated before **fixed_pattern_removed**; may need rerunning
 
-### 2024-08-11
-- L1 downloaded — 2026-05-28
-- L1.1 + iris_prep background subtraction — 2026-06-30
-- FPR — 2026-07-08
-- DSP — 2026-07-21
+## 2020-04-22
+
+- L1 downloaded from JSOC — 2024-01-19
+- L1.1 iris_prep part 1 + Wülser background — 2024-01-23
+
+## 2020-09-06
+
+- L1 downloaded from JSOC — 2024-01-24
+- L1.1 iris_prep part 1 + Wülser background — 2024-01-25
+
+## 2021-04-18
+
+Not started.
+
+- _not started_
+
+## 2021-10-16
+
+Not started.
+
+- _not started_
+
+## 2022-05-07
+
+- L1 downloaded from JSOC — 2026-06-30
+- L1.1 iris_prep part 1 + Wülser background — 2026-07-03
+
+## 2022-09-25
+
+Not started.
+
+- _not started_
+
+## 2023-03-27
+
+Very close in time to 2023-04-29 — maybe just choose one. Not started.
+
+- _not started_
+
+## 2023-04-29
+
+Not started.
+
+- _not started_
+
+## 2023-09-05
+
+Not started.
+
+- _not started_
+
+## 2024-03-10
+
+Not started.
+
+- _not started_
+
+## 2024-08-11
+
+2x spectral pixels; rebinned before radiometric calibration.
+
+*wavelength shift -0.018 Å; 2× spectral binning*
+
+- L1 downloaded from JSOC — 2026-05-28
+- L1.1 iris_prep part 1 + Wülser background — 2026-06-30
+- Fixed pattern removed — 2026-07-08
+- Despiked — 2026-07-21
 - L1.2 MSU background subtracted — 2026-07-26
-- L1.5 — 2026-07-28
-- L1.5 rebinned (had 2× spectral pixels) — 2026-07-31
+- L1.5 remainder of iris_prep — 2026-07-28
+- L1.5 rebinned — 2026-07-31
 - L1.6 radiometric conversion calculated — 2026-07-31
-- JSOC time range: `2024-08-11 00:02:44` → `2024-08-12 14:03:23`
 
-## Partially processed
+## 2024-09-02
 
-### 2015-10-18 (a couple of rasters are missing)
-- L1 downloaded via JSOC python notebook — 2025-03-27
-- L1.1 + iris_prep background subtraction — 2026-07-07
-- JSOC time range: `2015-10-18 10:26:27` → `2015-10-20 01:05:02`
+Very close in time to 2024-08-11, and the Si IV channel is degraded in some parts. Not started.
 
-### 2022-05-07
-- L1 downloaded — 2026-06-30
-- L1.1 + iris_prep background subtraction — 2026-07-03
-- JSOC time range: `2022-05-07 12:38:55` → `2022-05-09 03:11:37`
+- _not started_
 
-### 2019-05-05
-- L1 downloaded — 2024-02-21
-- L1.1 processed — 2025-01-03
-- FPR — 2025-01-15
-- DSP — 2025-01-16
-
-### 2015-04-01 (large chunk of data missing)
-- L1 downloaded via JSOC python notebook — 2025-03-26
-
-### 2017-10-21
-- L1 downloaded — 2024-02-18
-- L1.1 processed — 2024-02-20
-
-### 2018-08-25
-- L1 downloaded — 2024-02-20
-- L1.1 processed — 2024-02-21
-
-### 2020-04-22
-- L1 downloaded — 2024-01-19
-- L1.1 processed — 2024-01-23
-
-### 2020-09-06
-- L1 downloaded — 2024-01-24
-- L1.1 processed — 2024-01-25
-
-## Not yet started
-
-- 2013-10-27 `*`
-- 2014-03-17 `*`
-- 2019-04-13 (large chunk of data missing)
-- 2021-04-18
-- 2021-10-16
-- 2022-09-25
-- 2023-03-27 (very close in time to 2023-04-29 — maybe just choose one)
-- 2023-04-29
-- 2023-09-05
-- 2024-03-10
-- 2024-09-02 (very close in time to 2024-08-11, and the Si IV channel is
-  degraded in some parts)
-
-## Per-mosaic parameters
-
-These now live in `config/<date>.yaml`; the table is a summary.
-
-| mosaic | wavelength shift | notes |
-|---|---|---|
-| 2014-03-24 | +0.015 Å | 5 s step cadence |
-| 2019-09-12 | +0.011 Å | |
-| 2024-08-11 | −0.018 Å | 2× spectral binning; needs rebinning before L1.6 |
-
-Each mosaic's shift is stored as `wavelength_shift_angstrom` in its config, and
-is available during science analysis without opening a notebook:
-
-```python
-from iris_mosaics import wavelength_shift
-sg_wavelength_aligned = sg_wavelength_full + wavelength_shift('20240811')
-```
-
-Raster length is 64 images for all mosaics processed so far.

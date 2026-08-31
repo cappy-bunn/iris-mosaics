@@ -141,19 +141,24 @@ iris-mosaics/
     "Do I need to rerun this??" (despiked 2026-01-14, but fixed-pattern removed
     2026-04-06), which is exactly the question the ledger could not answer.
 
-### Phase 3 — automate (including filament)
+### Phase 3 — automate (including filament) — COMPLETE
 
-11. **Remote execution instead of remote elimination.** `iris_prep` is deep
-    SSW IDL and stays on filament. Only two `.pro` scripts are involved
-    (`apply_iris_prep_through_bg_subtraction.pro`,
-    `apply_remaining_iris_prep.pro`). Automate around them:
-    - SSH key auth (from phase 0) enables non-interactive remote commands.
-    - Pipe a generated IDL batch script into `sswidl` (verified working
-      headless). Parameterize paths via the generated script instead of
-      hand-editing the `.pro` files on filament.
-    - Long jobs (7–9 h) outlive the connection: launch with `screen -dm` and
-      poll a sentinel file for completion. This is mandatory, not optional —
-      the campus VPN can drop mid-run.
+11. **Remote execution instead of remote elimination.** DONE.
+    `iris_mosaics.remote` renders each IDL pass from a template in `idl/`
+    (`prep_part1.pro.template`, `prep_part2.pro.template`) with this mosaic's
+    paths substituted, uploads it, and launches it under `screen -dm` so it
+    outlives the SSH connection and any VPN drop. The hand-edited
+    `.pro` files are kept for reference but are no longer the thing that runs.
+
+    Completion is detected by a sentinel file holding the **shell's** exit
+    status, not by anything IDL writes, so a crashed or killed IDL reports
+    `failed` rather than appearing to run forever. `launch` refuses to start a
+    second copy of a job that is already running.
+
+    Remote commands are piped to `sh` over **stdin** rather than passed as
+    arguments: ssh flattens arguments into one string for the login shell to
+    re-parse, so argument quoting would have to survive tcsh as well as sh.
+    An earlier attempt using `sh -c '<quoted>'` failed exactly this way.
 12. **Transfers.** DONE. `iris_mosaics.transfer` wraps rsync with `--partial`
     for resume-after-drop, plus free-space and file-count checks;
     `upload_to_filament.ipynb` uses it. Windows OpenSSH has no rsync, so it is
@@ -167,14 +172,38 @@ iris-mosaics/
     match the local files. Comparing size alone correctly recognises them as
     already present. Verified against 20240811 level_12 (11,767 files,
     53.7 GB): default would re-send all of them, `--size-only` sends none.
-13. **Storage lifecycle.** See below; the orchestrator owns this rather than
-    leaving it to memory.
-14. **Orchestration.** A small CLI, e.g.
-    `python -m iris_mosaics run 20240811 --from despike --to build`, where each
-    step declares file inputs/outputs and completed steps are skipped.
-    Snakemake is a good fit if a real DAG runner proves warranted. Diagnostic
-    notebooks executed per-run via papermill give an inspectable record of
-    every mosaic without manual clicking.
+13. **Storage lifecycle.** DONE. `remote.cleanup_level` deletes a superseded
+    level from filament, but only when given the number of files verified in
+    the local archive *and* that number matches what is on filament, *and*
+    `confirm=True` is passed explicitly. Deleting data is not something to do
+    on inference: the local archive is the only copy that matters.
+14. **Orchestration.** DONE for the parts worth automating.
+    `iris_mosaics.pipeline` declares the 14 steps with their prerequisites, and
+    `python -m iris_mosaics` drives them:
+
+    ```
+    python -m iris_mosaics status                  # every mosaic, one line each
+    python -m iris_mosaics status 20240811         # step by step
+    python -m iris_mosaics idl launch prep1 20240811
+    python -m iris_mosaics idl watch  prep1 20240811
+    python -m iris_mosaics record despiked 20240811 --n-files 11767
+    ```
+
+    `idl launch` refuses to start when the prerequisite step is not recorded
+    (overridable with `--force`); `idl watch` polls, reports the output file
+    count as progress, records the manifest entry on success, and prints the
+    log tail on failure.
+
+    **Local steps stay in the notebooks deliberately.** The introspection is
+    the point of them, and a papermill-style headless run would discard exactly
+    what makes them useful. The CLI says which notebook is next and records
+    that it was done, rather than pretending to run it.
+
+    `next_step` reports the first unrecorded step *after* the furthest one
+    completed, not simply the first unrecorded one — the transcribed ledger has
+    holes (it never tracked the rolling trimmed mean), and a mosaic at level 1.6
+    should not be told to redo an earlier stage. Those holes are surfaced
+    separately by `record_gaps` rather than silently trusted.
 
 ### Storage lifecycle
 

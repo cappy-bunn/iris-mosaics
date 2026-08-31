@@ -1,0 +1,19 @@
+; Apply iris_prep through the FUV background subtraction, then stop.
+; (Includes dark subtraction and the Wulser Zernike FUV background.)
+;
+; TEMPLATE -- iris_mosaics.remote fills in the paths per mosaic and uploads the
+; result. Do not hand-edit the generated copy on filament; edit this instead.
+
+f = file_search('{input_glob}', count=nfits)
+print, 'IRIS_MOSAICS: input files found: ', nfits
+
+for kk = 0, nfits-1 do begin
+ read_iris, f[kk], index, data
+ iris_prep, index, data, oindex, odata, {keywords}
+ hdr = struct2fitshead(oindex)
+ file = file_basename(f[kk])
+ writefits, '{output_dir}/'+file, odata, hdr
+endfor
+
+print, 'IRIS_MOSAICS: done'
+end

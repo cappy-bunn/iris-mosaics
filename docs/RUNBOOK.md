@@ -21,6 +21,18 @@ Levels produced, in order: **L1** (raw from JSOC) → **L1.1** (`iris_prep` part
 Steps run either **locally** or on **filament**; the data crosses between them
 four times, which dominates the wall-clock time.
 
+## What runs next
+
+```bash
+python -m iris_mosaics status            # every mosaic, one line each
+python -m iris_mosaics status 20240811   # this mosaic, step by step
+```
+
+The step list, its prerequisites and each mosaic's progress live in
+`iris_mosaics.pipeline` and `status/<date>.json`. Local steps are notebooks and
+are run by hand — the introspection is the point — but the CLI says which one
+is next and records that it was done.
+
 ## Before you start
 
 - Connect to the **campus VPN**. filament is unreachable without it.
@@ -50,16 +62,19 @@ filament first and verifies the file count afterwards.
 
 ## 3. Level 1.1: iris_prep part 1 + Wülser background (filament, ~7 h)
 
-`idl/apply_iris_prep_through_bg_subtraction.pro`
-
-Edit the input/output paths in the `.pro` file for this mosaic, then:
-
+```bash
+python -m iris_mosaics idl launch prep1 20240811
+python -m iris_mosaics idl watch  prep1 20240811
 ```
-ssh filament
-cd /disk/data/cbunn/calibrated_iris_mosaics/
-sswidl
-IDL> .r apply_iris_prep_through_bg_subtraction.pro
-```
+
+`launch` renders `idl/prep_part1.pro.template` with this mosaic's paths,
+uploads it, and starts it detached under `screen` — it keeps running when the
+SSH connection closes and when the VPN drops. `watch` polls, showing how many
+output files have been written, records the manifest entry when it finishes,
+and prints the log tail if it fails.
+
+Inspect before running with `idl render prep1 <date>`; check on a run later
+with `idl status`, `idl log`, or stop it with `idl stop`.
 
 Runs `iris_prep` only as far as the FUV background subtraction, using
 `/noflat, /nobad, /nowarp, /filter_fid`:
@@ -73,12 +88,6 @@ Runs `iris_prep` only as far as the FUV background subtraction, using
 
 Note `/header_temps` (use temperature data in image headers) shifts things
 wildly and is not used.
-
-For a long unattended run, launch it detached so a VPN drop cannot kill it:
-
-```
-ssh filament "screen -dm sh -c 'cd /disk/data/cbunn/calibrated_iris_mosaics && sswidl < apply_iris_prep_through_bg_subtraction.pro > prep1.log 2>&1'"
-```
 
 ## 4. Download level 1.1 to local (~1 h)
 
@@ -148,10 +157,13 @@ lines, not the continuum level.
 
 ## 9. Level 1.5: remainder of iris_prep (filament, ~9 h)
 
-`idl/apply_remaining_iris_prep.pro` — same launch pattern as step 3.
+```bash
+python -m iris_mosaics idl launch prep2 20240811
+python -m iris_mosaics idl watch  prep2 20240811
+```
 
-Uses `/nosat, /nodark, /noback, /shift_wave, /shift_fid, /poly2d, /filter_wave,
-/filter_fid, /filter_aia`:
+Renders `idl/prep_part2.pro.template`. Uses `/nosat, /nodark, /noback,
+/shift_wave, /shift_fid, /poly2d, /filter_wave, /filter_fid, /filter_aia`:
 
 | keyword | effect |
 |---|---|

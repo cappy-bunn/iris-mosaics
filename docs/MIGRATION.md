@@ -159,6 +159,26 @@ iris-mosaics/
     arguments: ssh flattens arguments into one string for the login shell to
     re-parse, so argument quoting would have to survive tcsh as well as sh.
     An earlier attempt using `sh -c '<quoted>'` failed exactly this way.
+
+    Verified end to end against filament: `not started` → `running` → `done`,
+    with the log retrievable. Three bugs surfaced only in that live test, all
+    of which looked identical from the outside (job launches, then no sentinel
+    ever appears):
+
+    - **`sswidl` is a tcsh alias**, not an executable, so it does not exist in
+      the `sh` these jobs run in. Invoking `/ssw/gen/setup/ssw_idl` directly
+      works from any shell — it is a `#!/bin/csh -f` script that sets up SSW
+      itself.
+    - **`subprocess`'s text mode translates LF to CRLF on Windows**, so every
+      command reached the remote shell with a trailing carriage return.
+      Builtins tolerated it (`echo` printed an invisible CR) but every external
+      command became `name<CR>` and failed, and redirects wrote to files whose
+      names ended in a carriage return — the sentinels existed all along as
+      `<job>.done`. `_ssh` now sends bytes.
+    - The templates ended in `end`, which is a syntax error when piped into
+      IDL's stdin (it is only meaningful with `.r`). Harmless, but it put
+      `% Syntax error.` at the tail of every log, which reads like a failure.
+      They end in `exit` now.
 12. **Transfers.** DONE. `iris_mosaics.transfer` wraps rsync with `--partial`
     for resume-after-drop, plus free-space and file-count checks;
     `upload_to_filament.ipynb` uses it. Windows OpenSSH has no rsync, so it is

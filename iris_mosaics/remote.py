@@ -40,6 +40,15 @@ IDL_DIR = pl.Path(__file__).parent.parent / "idl"
 #: Where generated scripts, logs and sentinels are kept on filament.
 REMOTE_WORK_DIR = "/disk/data/cbunn/calibrated_iris_mosaics"
 
+#: SSW IDL launcher, by absolute path.
+#:
+#: ``sswidl`` is a *tcsh alias* for this script, so it does not exist under the
+#: ``sh`` these jobs run in -- invoking it by name fails with "command not
+#: found" after the job has already been launched. The script is
+#: ``#!/bin/csh -f`` and sets up the SSW environment itself, so calling it
+#: directly works from any shell.
+SSW_IDL = "/ssw/gen/setup/ssw_idl"
+
 
 @dataclasses.dataclass(frozen=True)
 class IdlStep:
@@ -136,8 +145,22 @@ def _ssh(command: str, check: bool = True) -> subprocess.CompletedProcess:
     stdin sidesteps that entirely and lets the script contain whatever it likes.
     """
     argv = ["ssh", "-o", "BatchMode=yes", FILAMENT_HOST, "sh"]
-    return subprocess.run(
-        argv, input=command, capture_output=True, text=True, check=check
+    # Send bytes, not text. subprocess's text mode applies universal-newline
+    # translation on write, so on Windows every LF becomes CRLF -- the remote
+    # sh then sees each command with a trailing carriage return. Builtins
+    # tolerate it (echo just prints the CR) but every external command becomes
+    # 'name<CR>' and fails with 'No such file or directory', and redirects land
+    # in files whose names end in a carriage return. This is silent unless you
+    # read stderr: jobs appear to launch fine and never produce a sentinel.
+    # Encoding here keeps the line endings exactly as written.
+    result = subprocess.run(
+        argv, input=command.encode("utf-8"), capture_output=True, check=check
+    )
+    return subprocess.CompletedProcess(
+        result.args,
+        result.returncode,
+        result.stdout.decode("utf-8", errors="replace"),
+        result.stderr.decode("utf-8", errors="replace"),
     )
 
 
@@ -172,7 +195,7 @@ def launch(step: str, cfg, dry_run: bool = False) -> str:
     # The sentinel is written by the shell, not by IDL, so a crash is visible.
     inner = (
         f"cd {REMOTE_WORK_DIR} && "
-        f"sswidl < {p['script']} > {p['log']} 2>&1; "
+        f"{SSW_IDL} < {p['script']} > {p['log']} 2>&1; "
         f"echo $? > {p['sentinel']}"
     )
     remote_script = "\n".join([

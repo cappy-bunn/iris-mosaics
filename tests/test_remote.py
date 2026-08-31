@@ -160,3 +160,81 @@ def test_cleanup_deletes_when_verified(cfg, monkeypatch):
     target = remote.cleanup_level(cfg, "level_1", expected_count=11767, confirm=True)
     assert target.endswith("/level_1")
     assert any(c.startswith("rm -rf ") and c.endswith("/level_1") for c in fake.commands)
+
+
+def test_launch_invokes_ssw_idl_by_absolute_path(cfg, monkeypatch):
+    """`sswidl` is a tcsh alias and does not exist under the sh jobs run in.
+
+    Regression test: invoking it by name launched fine and then failed inside
+    the detached job with "sswidl: command not found", which is only visible
+    after the fact in the log.
+    """
+    fake = FakeSSH("ABSENT")
+    monkeypatch.setattr(remote, "_ssh", fake)
+    monkeypatch.setattr(remote, "status", lambda step, cfg: "not started")
+    remote.launch("prep1", cfg)
+
+    launched = "\n".join(fake.commands)
+    assert remote.SSW_IDL in launched
+    assert "/ssw/" in remote.SSW_IDL
+    # the bare alias must not appear as the command being run
+    assert "screen -dmS" in launched
+    for line in launched.splitlines():
+        if "screen -dmS" in line:
+            assert "sswidl <" not in line, "bare alias would fail under sh"
+
+
+def test_launch_writes_sentinel_from_the_shell_not_idl(cfg, monkeypatch):
+    """A crashed IDL must still produce a sentinel, so status can report it."""
+    fake = FakeSSH("ABSENT")
+    monkeypatch.setattr(remote, "_ssh", fake)
+    monkeypatch.setattr(remote, "status", lambda step, cfg: "not started")
+    remote.launch("prep1", cfg)
+
+    launched = "\n".join(fake.commands)
+    assert "echo $? >" in launched, "shell must record the exit status"
+
+
+def test_ssh_sends_bytes_not_text(monkeypatch):
+    """Regression: text mode would turn every LF into CRLF on Windows.
+
+    The remote sh then saw each command with a trailing carriage return, so
+    external commands failed as "name<CR>: No such file or directory" and
+    redirects wrote to files whose names ended in a CR. Jobs looked like they
+    launched fine and simply never produced a sentinel.
+    """
+    captured = {}
+
+    def fake_run(argv, input=None, capture_output=False, check=False):
+        captured["input"] = input
+
+        class R:
+            args = argv
+            returncode = 0
+            stdout = b""
+            stderr = b""
+
+        return R()
+
+    lf = chr(10)
+    cr = chr(13)
+
+    monkeypatch.setattr(remote.subprocess, "run", fake_run)
+    remote._ssh(f"echo one{lf}echo two{lf}")
+
+    sent = captured["input"]
+    assert isinstance(sent, bytes), "must send bytes to avoid CRLF translation"
+    assert cr.encode() not in sent, "no carriage returns may reach the remote shell"
+    assert sent == f"echo one{lf}echo two{lf}".encode()
+
+
+def test_templates_end_with_exit_not_end():
+    """Piped into IDL's stdin, a bare `end` is a syntax error.
+
+    It was harmless but put "% Syntax error." at the tail of every log, which
+    reads like a failed run.
+    """
+    for name in ("prep_part1.pro.template", "prep_part2.pro.template"):
+        text = (remote.IDL_DIR / name).read_text(encoding="utf-8")
+        assert text.rstrip().endswith("exit"), name
+        assert not text.rstrip().endswith(chr(10) + "end"), name

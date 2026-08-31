@@ -16,4 +16,7 @@ for kk = 0, nfits-1 do begin
 endfor
 
 print, 'IRIS_MOSAICS: done'
-end
+; 'exit' rather than 'end': this script is piped into IDL's stdin, where a
+; bare 'end' is a syntax error (it is only meaningful with .r). The error was
+; harmless but appeared at the tail of every log, which is misleading.
+exit

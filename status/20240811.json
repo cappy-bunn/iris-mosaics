@@ -24,6 +24,11 @@
     },
     "level_16": {
       "date": "2026-07-31"
+    },
+    "mosaic": {
+      "date": "2026-08-03",
+      "bytes": 16815641636,
+      "source": "file mtime of level_15_fdm.pickle"
     }
   },
   "notes": "2x spectral pixels; rebinned before radiometric calibration."

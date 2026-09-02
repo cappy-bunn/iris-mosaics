@@ -31,6 +31,7 @@ See [RUNBOOK.md](RUNBOOK.md) for the procedure. Per-mosaic parameters live in
 - L1.2 MSU background subtracted — 2026-05-25
 - L1.5 remainder of iris_prep — 2026-05-26
 - L1.6 radiometric conversion calculated — 2026-07-30
+- Mosaic assembled — 2026-08-03 (bytes=16815641636, source=file mtime of level_15_fdm.pickle)
 
 ## 2015-04-01
 
@@ -81,6 +82,7 @@ Despike predates fixed-pattern removal in the original ledger.
 - L1.2 MSU background subtracted — 2026-04-07
 - L1.5 remainder of iris_prep — 2026-04-15
 - L1.6 radiometric conversion calculated — 2026-07-30
+- Mosaic assembled — 2026-08-03 (bytes=16815641636, source=file mtime of level_15_fdm.pickle)
 - ⚠️ **despiked** is dated before **fixed_pattern_removed**; may need rerunning
 
 ## 2020-04-22
@@ -154,6 +156,7 @@ Not started.
 - L1.5 remainder of iris_prep — 2026-07-28
 - L1.5 rebinned — 2026-07-31
 - L1.6 radiometric conversion calculated — 2026-07-31
+- Mosaic assembled — 2026-08-03 (bytes=16815641636, source=file mtime of level_15_fdm.pickle)
 
 ## 2024-09-02
 

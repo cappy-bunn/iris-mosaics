@@ -174,7 +174,8 @@ iris-mosaics/
       Builtins tolerated it (`echo` printed an invisible CR) but every external
       command became `name<CR>` and failed, and redirects wrote to files whose
       names ended in a carriage return — the sentinels existed all along as
-      `<job>.done`. `_ssh` now sends bytes.
+      `<job>.done
+`. `_ssh` now sends bytes.
     - The templates ended in `end`, which is a syntax error when piped into
       IDL's stdin (it is only meaningful with `.r`). Harmless, but it put
       `% Syntax error.` at the tail of every log, which reads like a failure.
@@ -292,3 +293,25 @@ Constraints learned while probing:
 Phases 0–1 are quick and unblock everything. Phase 2 alone removes most of the
 error-prone per-mosaic cell editing. Item 11 (remote IDL + restartable
 transfers) is what collapses the "babysit filament for a week" problem.
+
+## Layer 0 — the handoff to science
+
+The science notebooks (EE detection, the solar-cycle study, paper 1) read the
+assembled mosaic and the radiometric factor by typed `D:` paths and re-type the
+wavelength shift per epoch. `iris_mosaics.assembled` is now the single way in:
+`MosaicConfig` knows the two files (`mosaic_path`, `radiometric_path`,
+`area_path`), `not_ready_reasons` checks the manifest and files, `load` applies
+the calibrations and the crop once, and `provenance` records what went in so a
+science product can say which mosaic file and package version built it. The
+`mosaic` manifest step, never recorded in the old ledger, is now recorded for
+the three finished mosaics from the files' own modification times.
+
+The science migration builds on this in its own repository; see the
+architecture discussion recorded there.
+
+Verified against the real 2019-09-12 mosaic: `assembled.load` reproduces the
+EE notebook's hand-done steps exactly. The wavelength axis matches the one the
+notebook saved into `2019_products.pkl` to the last digit (max difference 0),
+the cropped spatial shape is identical (1000 × 6012), and the cropped spatial
+WCS has the same reference pixel and value. The 16.8 GB load took 144 s.
+

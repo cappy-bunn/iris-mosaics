@@ -207,6 +207,34 @@ Mosaics with 2× spectral binning (e.g. 2024-08-11) are rebinned first.
 `notebooks/build_and_save_mosaic.ipynb` — stitches the rasters into the full
 disk and saves the mosaic with its WCS.
 
+## Handing off to science
+
+The pipeline's output, per mosaic, is the assembled mosaic
+(`level_15_fdm.pickle`, ~17 GB) and the radiometric factor
+(`<date>_radiometric_calibration_conversion_factor.fits`), plus the wavelength
+shift in `config/<date>.yaml`. Science code should not spell those paths or
+re-type the shift; it should go through `iris_mosaics.assembled`:
+
+```python
+from iris_mosaics import assembled
+
+assembled.not_ready_reasons('20190912')   # [] once level 1.6 and the mosaic are recorded
+m = assembled.load('20190912')            # ~17 GB, a few minutes
+m.data          # cropped cube in DN, axes (x, y, wavelength)
+m.wavelength    # Angstrom, shift already applied
+m.dn2flux       # radiometric factor on the same wavelength grid
+m.spatial_wcs   # 2-axis WCS of the cropped plane
+m.provenance    # which files, shift and package version this came from
+```
+
+`load` applies the wavelength shift, resamples the radiometric factor onto the
+mosaic's axis, and crops the empty border to ±1000″, exactly as the science
+notebooks used to do by hand. It does not multiply the cube by the factor;
+`m.calibrate()` does, at the cost of a second 17 GB array.
+
+Record `mosaic` in the manifest when `build_and_save_mosaic.ipynb` finishes,
+or `not_ready_reasons` will say the mosaic is not ready.
+
 ## Storage
 
 Two tiers with different rules:

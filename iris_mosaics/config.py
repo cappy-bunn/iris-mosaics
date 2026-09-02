@@ -124,3 +124,25 @@ class MosaicConfig:
     def remote_root(self) -> str:
         """Working directory for this mosaic on filament."""
         return f"/disk/data/cbunn/calibrated_iris_mosaics/deep_mosaics/{self.date}"
+
+    # -- what the pipeline hands to science ---------------------------------
+
+    @property
+    def mosaic_path(self) -> pl.Path:
+        """The assembled mosaic: a pickled dict of ``data`` and ``wcs``.
+
+        Written by ``build_and_save_mosaic.ipynb``; ~17 GB for a deep mosaic.
+        """
+        return self.data_root / "level_15_fdm.pickle"
+
+    @property
+    def radiometric_path(self) -> pl.Path:
+        """DN → W nm⁻¹ sr⁻¹ m⁻² factor versus wavelength, from
+        ``radiometric_calibration.ipynb``. Primary HDU holds the factor, the
+        ``WAVELENGTH`` extension the wavelengths it is tabulated at."""
+        return self.data_root / f"{self.date}_radiometric_calibration_conversion_factor.fits"
+
+    @property
+    def area_path(self) -> pl.Path:
+        """Effective area of the FUV spectrograph used for the radiometric factor."""
+        return self.data_root / f"{self.date}_area_sg_fuv.fits"

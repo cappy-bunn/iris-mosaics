@@ -21,6 +21,11 @@
     },
     "level_16": {
       "date": "2026-07-30"
+    },
+    "mosaic": {
+      "date": "2026-08-03",
+      "bytes": 16815641636,
+      "source": "file mtime of level_15_fdm.pickle"
     }
   },
   "notes": "Despike predates fixed-pattern removal in the original ledger."

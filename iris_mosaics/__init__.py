@@ -15,7 +15,11 @@ from .plotting import plot_lines_sidebyside
 from .rasters import RasterLayout, plan_rasters, read_pointing
 from .manifest import Manifest
 from .assembled import AssembledMosaic
-from . import assembled, background, despike, fixed_pattern, transfer
+from .geometry import (
+    for_plotting, solar_geometry, annulus_labels, annulus_radii,
+    plot_annuli, find_disk_center,
+)
+from . import assembled, background, despike, fixed_pattern, geometry, transfer
 
 #: Names served lazily from .read_full_disk_mosaic
 _MOSAIC_EXPORTS = frozenset({
@@ -29,12 +33,6 @@ _MOSAIC_EXPORTS = frozenset({
     "build_mosaic_regrid",
     "build_mosaic_sav",
     "build_mosaic_single_wavelength",
-    "for_plotting",
-    "solar_geometry",
-    "annulus_labels",
-    "annulus_radii",
-    "plot_annuli",
-    "find_disk_center",
 })
 
 __all__ = sorted(

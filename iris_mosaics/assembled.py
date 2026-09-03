@@ -115,6 +115,25 @@ def crop_to_disk(data: np.ndarray, wcs, half_width: u.Quantity = DEFAULT_CROP):
     return cropped, spatial_wcs, (kmin, kmax, jmin, jmax)
 
 
+def solar_radius(date: str) -> u.Quantity:
+    """The apparent photospheric solar radius at the mosaic epoch, from the
+    ``RSUN_OBS`` header of a level 1.5 file near the middle of the mosaic.
+
+    This is the radius mu and the equal-area annuli should be built on. The
+    transition-region emission extends a few arcsec above it (the automated
+    limb fit lands ~4″ higher on 2019-09-12), so anything meant to *contain*
+    the emission is a separate, larger boundary, not a substitute for this.
+    """
+    cfg = MosaicConfig.load(date)
+    files = cfg.files("level_15")
+    if not files:
+        raise FileNotFoundError(f"no level 1.5 files for {date} under {cfg.level_path('level_15')}")
+    header = fits.getheader(files[len(files) // 2])
+    if "RSUN_OBS" not in header:
+        raise KeyError(f"RSUN_OBS missing from {files[len(files) // 2]}")
+    return float(header["RSUN_OBS"]) * u.arcsec
+
+
 # --------------------------------------------------------------------------
 # readiness and provenance
 # --------------------------------------------------------------------------

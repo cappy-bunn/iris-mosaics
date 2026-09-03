@@ -180,6 +180,23 @@ def test_provenance_records_files_shift_and_commit(sandbox):
     assert p["iris_mosaics_commit"] is None or len(p["iris_mosaics_commit"]) == 40
 
 
+def test_solar_radius_reads_rsun_obs(sandbox):
+    level15 = sandbox.level_path("level_15")
+    level15.mkdir()
+    for i, r in enumerate((953.0, 953.1, 953.2)):
+        hdu = fits.PrimaryHDU(data=np.zeros((2, 2)))
+        hdu.header["RSUN_OBS"] = r
+        hdu.writeto(level15 / f"f{i}.fits")
+    r = assembled.solar_radius("20990101")
+    assert r.unit == u.arcsec
+    assert r.value == pytest.approx(953.1)   # the middle file
+
+
+def test_solar_radius_without_files_raises(sandbox):
+    with pytest.raises(FileNotFoundError):
+        assembled.solar_radius("20990101")
+
+
 def test_config_science_paths():
     cfg = MosaicConfig(date="20190912", data_root=pl.Path("D:/x/20190912"))
     assert cfg.mosaic_path.name == "level_15_fdm.pickle"

@@ -12,10 +12,26 @@ import numpy as np
 
 
 def _solar_axes(wcs):
-    """0-based FITS-axis indices of (Solar X, Solar Y), read from CTYPE."""
+    """0-based FITS-axis indices of (Solar X, Solar Y), read from CTYPE.
+
+    Accepts both the IRIS level-1 style names ("Solar X"/"Solar Y") and the
+    standard helioprojective ones (HPLN = longitude = X, HPLT = latitude = Y).
+    """
     ctypes = [str(c).upper() for c in wcs.wcs.ctype]
-    ax_x = next(i for i, c in enumerate(ctypes) if 'X' in c)
-    ax_y = next(i for i, c in enumerate(ctypes) if 'Y' in c)
+
+    def is_x(c):
+        return 'HPLN' in c or ('X' in c and 'HPL' not in c)
+
+    def is_y(c):
+        return 'HPLT' in c or ('Y' in c and 'HPL' not in c)
+
+    try:
+        ax_x = next(i for i, c in enumerate(ctypes) if is_x(c))
+        ax_y = next(i for i, c in enumerate(ctypes) if is_y(c))
+    except StopIteration:
+        raise ValueError(
+            f"cannot identify the solar X/Y axes from CTYPE {ctypes}; expected "
+            "names containing X/Y or HPLN/HPLT") from None
     return ax_x, ax_y
 
 

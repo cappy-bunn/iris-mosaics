@@ -25,7 +25,7 @@ wavelength_shift_angstrom: null
 
 # Occulting geometry for fixed-pattern removal (off-disk pixel selection).
 # Not yet determined for this mosaic -- run remove_fixed_pattern_full_ccd.ipynb,
-# check the disk is centred in the mask, and record the values here.
+# check the disk is centered in the mask, and record the values here.
 off_disk:
   limb_radius_arcsec: null
   margin_arcsec: 60

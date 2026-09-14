@@ -1,6 +1,6 @@
 """Solar-disk geometry on the mosaic grid.
 
-Disk-centre fitting, radial distance and mu, equal-area annuli, and the
+Disk-center fitting, radial distance and mu, equal-area annuli, and the
 plotting-orientation helpers. Split out of ``read_full_disk_mosaic`` because
 that module imports ``reproject``/``regridding`` for mosaic assembly, and the
 science side needs only this geometry, which is plain numpy and astropy.

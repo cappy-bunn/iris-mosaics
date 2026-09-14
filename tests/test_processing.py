@@ -15,7 +15,7 @@ def test_off_disk_mask_marks_outside_the_occulting_radius():
     x = np.array([0, 0, 2000, 0]) * u.arcsec
     y = np.array([0, 500, 0, 2000]) * u.arcsec
     mask = fixed_pattern.off_disk_mask(x, y, limb_radius=960 * u.arcsec, margin=60 * u.arcsec)
-    # disk centre and 500" out are on-disk; 2000" out is off-disk
+    # disk center and 500" out are on-disk; 2000" out is off-disk
     assert not mask[0] and not mask[1]
     assert mask[2] and mask[3]
 
@@ -36,8 +36,8 @@ def test_off_disk_center_offset_shifts_the_circle():
         x, y, 960 * u.arcsec, margin=0 * u.arcsec,
         center_offset=(100 * u.arcsec, 0 * u.arcsec),
     )
-    assert plain[0]        # 1000" from an unshifted centre -> off disk
-    assert not shifted[0]  # shifting the centre brings it inside
+    assert plain[0]        # 1000" from an unshifted center -> off disk
+    assert not shifted[0]  # shifting the center brings it inside
 
 
 def test_off_disk_mask_does_not_mutate_its_input():

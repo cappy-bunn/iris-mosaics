@@ -34,7 +34,7 @@ def velocity_to_pixels(velocity_km_s: float, wavelength: float, dispersion: floa
     """Half-width in pixels corresponding to a Doppler velocity.
 
     Used to decide how much of the spectrum around a line to mask: everything
-    within ``velocity_km_s`` of line centre is considered line, not background.
+    within ``velocity_km_s`` of line center is considered line, not background.
     """
     return (velocity_km_s / C_KM_S) * wavelength / dispersion
 

@@ -25,7 +25,7 @@ wavelength_shift_angstrom: 0.011
 
 # Occulting geometry for fixed-pattern removal (off-disk pixel selection).
 # limb_radius_arcsec null means: read RSUN_OBS from the FITS header and add
-# 10 arcsec. The centre offsets recentre the mask on the actual solar disk.
+# 10 arcsec. The center offsets recenter the mask on the actual solar disk.
 off_disk:
   limb_radius_arcsec: 965
   margin_arcsec: 60

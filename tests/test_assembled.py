@@ -25,7 +25,7 @@ from iris_mosaics.manifest import Manifest
 def make_wcs(n_wave=50, n_y=40, n_x=30, pix_arcsec=2.0, wave0_A=1390.0, dwave_A=0.05):
     """3-axis WCS: (wavelength in m, solar-y in deg, solar-x in deg).
 
-    The spatial axes are centred so that world (0, 0) is mid-image, which is
+    The spatial axes are centered so that world (0, 0) is mid-image, which is
     what lets the crop test reason about which pixels survive.
     """
     w = astropy.wcs.WCS(naxis=3)

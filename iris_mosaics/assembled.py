@@ -58,7 +58,7 @@ def wavelength_axis(wcs, n_spectral: int) -> u.Quantity:
     """Wavelength of every spectral pixel, in Angstrom.
 
     The spectral axis is the first FITS axis (the last numpy axis) and the WCS
-    reports it in metres.
+    reports it in meters.
     """
     pix = np.arange(n_spectral)
     wave, _, _ = wcs.all_pix2world(pix, 0, 0, 0)

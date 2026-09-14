@@ -7,7 +7,7 @@ radius drawn generously around the limb — and subtracting removes it.
 Must run *before* despiking: the despiker would otherwise remove part of the
 fixed pattern, corrupting the estimate.
 
-The occulting geometry is per mosaic (the disk is not perfectly centred in the
+The occulting geometry is per mosaic (the disk is not perfectly centered in the
 pointing, and the limb radius changes through the year), so it comes from
 ``config/<date>.yaml`` rather than being edited into the notebook.
 """
@@ -28,7 +28,7 @@ def off_disk_mask(
     """True where a pixel lies outside the occulting disk.
 
     ``margin`` is added to the limb radius so that near-limb stray light does
-    not contaminate the estimate. ``center_offset`` recentres the circle on the
+    not contaminate the estimate. ``center_offset`` recenters the circle on the
     actual disk, which the pointing does not place exactly at the origin.
 
     ``x`` is wrapped into [-180°, 180°] first — helioprojective longitudes come

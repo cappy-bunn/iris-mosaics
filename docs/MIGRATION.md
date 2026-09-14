@@ -126,7 +126,7 @@ iris-mosaics/
    - `iris_mosaics.plotting.plot_lines_sidebyside` — was defined identically in
      three notebooks.
 
-   The occulting geometry `is_off_disk` used (limb radius, disk-centre offsets)
+   The occulting geometry `is_off_disk` used (limb radius, disk-center offsets)
    was carried in commented-out per-date blocks; it now lives in each config's
    `off_disk` section. Values recovered for 20140324, 20190912 and 20240811;
    20151018 and 20220507 have placeholders to fill in when they are processed.

@@ -151,6 +151,14 @@ Together these remove essentially all the background, including some genuine
 continuum. That is acceptable: the science target is the far wings of the Si IV
 lines, not the continuum level.
 
+The line mask is the one knob that matters for science: beyond it the far wing
+is taken for background and removed, so it must be wider than any band the
+census integrates. It is **+/- 200 km/s** (`v` in the mask cell) since 2026-10-07;
+the earlier 90 km/s cut the 1403 red wing at +98 km/s and put a false shelf
+there in every mosaic. The notebook reads the mosaic from one line and every
+pixel count from `cfg.spectral_binning`, as do the despike and rolling-mean
+notebooks; nothing is doubled by hand for a 2x binned mosaic any more.
+
 ## 8. Reupload to filament (~6 h)
 
 `notebooks/upload_to_filament.ipynb` with `level = 'level_12'`.
